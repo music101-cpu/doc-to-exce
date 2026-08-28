@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import io
+import time
 import pypdfium2 as pdfium
 from PIL import Image
 from google import genai
@@ -64,7 +65,7 @@ if st.button("เริ่มแปลงข้อมูล"):
             
             images_to_process = []
             
-            # แปลง PDF เป็นรูปภาพคมชัดสูง (scale=3)
+            # แปลง PDF เป็นรูปภาพ
             if file.name.lower().endswith(".pdf"):
                 pdf = pdfium.PdfDocument(file.read())
                 for page in pdf:
@@ -74,9 +75,12 @@ if st.button("เริ่มแปลงข้อมูล"):
                 images_to_process.append(Image.open(file))
 
             # ประมวลผลภาพทีละหน้า
-            for img in images_to_process:
+            for idx, img in enumerate(images_to_process):
+                # เว้นระยะห่างการเรียก API เพื่อป้องกันติด Rate Limit (429 Error)
+                if idx > 0:
+                    time.sleep(4)
+                
                 try:
-                    # เปลี่ยนโมเดลเป็น gemini-3.6-flash ตามที่ API แจ้งเตือน
                     response = client.models.generate_content(
                         model='gemini-3.6-flash',
                         contents=[img, PROMPT]
@@ -96,7 +100,7 @@ if st.button("เริ่มแปลงข้อมูล"):
                         all_results.append(data)
                         
                 except Exception as e:
-                    st.error(f"เกิดข้อผิดพลาดกับไฟล์ {file.name}: {e}")
+                    st.error(f"เกิดข้อผิดพลาดกับหน้า {idx+1} ของไฟล์ {file.name}: {e}")
             
             progress_bar.progress((i + 1) / total_files)
 
