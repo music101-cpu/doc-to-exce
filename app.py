@@ -9,7 +9,7 @@ from google import genai
 
 # 1. ตั้งค่าหน้าตา Web App
 st.set_page_config(page_title="Document to Excel Converter", layout="wide")
-st.title("📄 ระบบแปลงเอกสาร ท.ร. 14/1 เป็น Excel")
+st.title("📄 ระบบแปลงเอกสาร ท.ร. 14/1 เป็น Excel By Music")
 
 # 2. ช่องใส่ API Key และ อัปโหลดไฟล์
 api_key = st.sidebar.text_input("กรอก Gemini API Key", type="password")
